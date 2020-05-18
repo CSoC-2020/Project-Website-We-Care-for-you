@@ -1,21 +1,20 @@
-from django.shortcuts import render, redirect
-from django.views import generic
-from Blog.models import BlogPost, Images
-from Blog.forms import PostForm, ImageForm
+from django.shortcuts import render, redirect, get_object_or_404, reverse
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from Blog.models import BlogPost, Images, Comment
+from Blog.forms import PostForm, ImageForm, CommentForm
 from django.forms import modelformset_factory
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.template import RequestContext
 
 
-class BlogPostList(generic.ListView):
+class BlogPostList(ListView):
     queryset = BlogPost.objects.filter(status=1).order_by('-created_on')
-    template_name = 'blog/blogs.html'
+    template_name = 'blog/blogs.html'  
+    # incomplete (rendering of images in blogpost)
 
-class BlogPostDetail(generic.DetailView):
-    model = BlogPost
-    template_name = 'blog/blogpost_detail.html'
 
 @login_required
 def createBlogPost(request):
@@ -47,3 +46,64 @@ def createBlogPost(request):
         formset = ImageFormSet(queryset=Images.objects.none())
     return render(request, 'blog/create_blog_post.html',
                   {'postForm': postForm, 'formset': formset})
+
+
+@login_required
+def blogpost_detail(request, slug):
+    post = get_object_or_404(BlogPost, slug=slug)
+    comments = post.comments_on_blog.filter(active=True, parent__isnull=True)
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            parent_obj = None
+
+            try:
+                parent_id = int(request.POST.get('parent_id'))
+            except:
+                parent_id = None
+
+
+            if parent_id:
+                parent_obj = Comment.objects.get(id=parent_id)
+                if parent_obj:
+                    replay_comment = comment_form.save(commit=False)
+                    replay_comment_name = request.user
+                    replay_comment.parent = parent_obj
+            new_comment = comment_form.save(commit=False)            
+            new_comment.post = post
+            new_comment.name = request.user
+            
+            new_comment.save()
+            return redirect("blogpost-detail", slug=slug)
+    else:
+        comment_form = CommentForm()
+    return render(request,
+                  'blog/blogpost_detail.html',
+                  {'blogpost': post,
+                   'comments': comments,
+                   'comment_form': comment_form})
+
+class BPUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = BlogPost
+    fields = ['title', 'content']
+    success_url = "/blogs/"
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
+
+
+class BPDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = BlogPost
+    success_url = '/blogs/'
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False

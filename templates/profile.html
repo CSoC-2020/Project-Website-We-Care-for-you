@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <h2>profile of {{profile.user}}</h2>
+        <br>
+        <img src="{{ profile.image.url }}" alt="profile picture">
+        <br>
+        Username : {{user.username}} | Email : {{user.email}}
+        <br>
+        Bio : {{profile.bio}} | Number of Blogs : {{number_of_blogs}}
+    </div>
+    <hr>
+    <div>
+        <h1>Blogs so far</h1>
+        {% for post in posts %}
+            
+            {% for pic in post_images %}
+                <img style="width: 100px; height: 100px;" src="{{pic.image.url}}" alt="pic">
+            {% endfor %}
+            <h3>{{post.title}}</h3>( USER: {{post.author}} ) 
+            <p>{{post.get_date}}</p>
+            <div>
+                <p>{{post.content|slice:":200" }}</p>
+                <a href="{% url 'blogpost-detail' post.slug  %}">Read More &rarr;</a>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

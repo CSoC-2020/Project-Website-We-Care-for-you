@@ -1,3 +1,4 @@
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,15 +10,14 @@
     <a href="{% url 'create-blog-post' %}">New Post</a>
     {% for post in object_list %}
         
-        {{post.image}}
-        <h3>{{post.title}}</h3>( {{post.author}} )
+        
+        <h3>{{post.title}}</h3>( USER: <a href="{% url 'profileof' post.author.username %}">{{post.author}}</a> )
         <div>
-            <p>{{post.content}}</p>
             <p>{{post.content|slice:":200" }}</p>
-            <a href="{% url 'blogpost_detail' post.slug  %}">Read More &rarr;</a>
+            <a href="{% url 'blogpost-detail' post.slug  %}">Read More &rarr;</a>
         </div>
         
-        {{post.created_on}}
+        {{post.get_date}}
     {% endfor %}
 </body>
 </html>

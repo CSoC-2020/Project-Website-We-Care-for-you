@@ -1,7 +1,10 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db.models.signals import pre_save
 from django.template.defaultfilters import slugify
+from django.contrib.humanize.templatetags import humanize
+
 
 STATUS = (
     (0,"Draft"),
@@ -23,6 +26,9 @@ class ConfessionPost(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def get_date(self):
+        return humanize.naturaltime(self.created_on)
 
 def get_unique_slug(sender, instance, **kwargs):
     num = 1
@@ -34,3 +40,22 @@ def get_unique_slug(sender, instance, **kwargs):
     instance.slug=unique_slug
 
 pre_save.connect(get_unique_slug, sender=ConfessionPost)
+
+class Comment(models.Model):
+    post = models.ForeignKey(ConfessionPost, on_delete=models.CASCADE, related_name='comments')
+    name = models.ForeignKey(User, on_delete=models.CASCADE)
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+
+    class Meta:
+        # sort comments in chronological order by default
+        ordering = ('created',)
+
+    def __str__(self):
+        return 'Comment by {}'.format(self.name)
+
+    def get_date(self):
+        return humanize.naturaltime(self.created_on)

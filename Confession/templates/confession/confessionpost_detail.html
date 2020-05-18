@@ -1,4 +1,3 @@
-{% load humanize %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,15 +7,15 @@
 </head>
 <body>
     <div>
-        <h4>{{blogpost.title}}</h4>
-        <p>{{blogpost.content}}</p>
-        <p>{{blogpost.get_date}}</p>
+        <h4>{{confessionpost.title}}</h4>
+        <p>{{confessionpost.content}}</p>
+        <p>{{confessionpost.get_date}}</p>
     </div>
-    {% if request.user == blogpost.author %}
-        <a href="{% url 'blogpost-update' blogpost.slug %}">Edit</a>
-        <a href="{% url 'blogpost-delete' blogpost.slug %}">Delete</a>
-    {% endif %}
     <hr>
+    {% if request.user == confessionpost.author %}
+        <a href="{% url 'confessionpost-update' confessionpost.slug %}">Edit</a>
+        <a href="{% url 'confessionpost-delete' confessionpost.slug %}">Delete</a>
+    {% endif %}
     <!-- Comments Form --> 
     <h2>Add a new comment</h2>
     <form action="." method="post">
@@ -27,15 +26,15 @@
 
     {% for comment in comments %}
         <div>
-            <p>USER: {{ comment.name }} | {{ comment.get_date }}</p>
+            <p> USER: {{ comment.name }} | {{ comment.created }}</p>
                 {{ comment.body|linebreaks }}
 
             {% for reply in comment.replies.all %}
-                <p>USER: {{ reply.name }} | {{ reply.get_date }}</p>
+                <p>USER: {{ reply.name }} | {{ reply.created }}</p>
                 <li>{{ reply.body }}</li>
             {% endfor %}
 
-            <h5>Reply</h5>
+            <h5>Replyy</h5>
             <form action="." method="post">
                 {{ comment_form.as_p }}
                 {% csrf_token %}
