@@ -43,7 +43,7 @@ pre_save.connect(get_unique_slug, sender=ConfessionPost)
 
 class Comment(models.Model):
     post = models.ForeignKey(ConfessionPost, on_delete=models.CASCADE, related_name='comments')
-    name = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     body = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

@@ -8,15 +8,16 @@
 <body>
     <a href="{% url 'create-confession-post' %}">New Post</a>
     {% for post in object_list %}
-        <h3>{{post.title}}</h3>
+        <h3>Title : {{post.title}}</h3>
         <p>{{post.get_date}}</p>
-        <p>{{post.content|slice:":200" }}</p>
-        <a href="{% url 'confessionpost-detail' post.slug  %}">Read More &rarr;</a>
+        
         {% if post.display_name %}
             <h4>USER(ANOMONOUS): {{post.display_name}}</h4>
         {% else %}
             <h4>USER: {{post.author}}</h4>
         {% endif %}
+        <p>Content :{{post.content|slice:":200" }}</p>
+        <a href="{% url 'confessionpost-detail' post.slug  %}">Read More &rarr;</a>
     {% endfor %}
 </body>
 </html>

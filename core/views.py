@@ -15,52 +15,35 @@ def profileView(request, username):
     profile = Profile.objects.get(user=user)
     posts = BlogPost.objects.filter(author=user)
     # post_images = Images.objects.filter(post=posts[0])  #Incomplete (rendering of images in blogpost)
-    print ("this prints")
     context = {
         'user':user,
         'profile':profile,
         'posts':posts,
-        'number_of_blogs':posts.count(),
         # 'post_images':post_images,
     }
     return render(request, 'profile.html', context)
-# class ProfileView(DetailView):
-#     model = Profile
-#     template_name = "profile.html"
-#     context_object_name = 'profile'
-#     def get_queryset(self):
-#         user = get_object_or_404(User, username=self.kwargs.get('username'))
-#         return Profile.objects.filter(user=user)
 
 
 
-# @login_required
-# def profile(request):
-#     if request.method == 'POST':
-#         u_form = UserUpdateForm(request.POST, instance=request.user)
-#         p_form = ProfileUpdateForm(request.POST,request.FILES, instance=request.user.profile)
-#         if u_form.is_valid() and p_form.is_valid():
-#             u_form.save()
-#             p_form.save()
-#             messages.success(request, f'Your account has been updated!')
-#             return redirect('profile')
 
-#     else:
-#         u_form = UserUpdateForm(instance=request.user)
-#         p_form = ProfileUpdateForm(instance=request.user.profile)
+@login_required
+def updateProfile(request):
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, f'Your account has been updated!')
+            return redirect('profile', username = request.user)
 
-#     context = {
-#         'u_form': u_form,
-#         'p_form': p_form
-#     }
-#     return render(request, 'profile.html', context)
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=request.user.profile)
 
-# class UserPostListView(ListView):
-#     model = BlogPost
-#     template_name = 'profile.html'
-#     context_object_name = 'blogposts'
-#     paginate_by = 5
+    context = {
+        'u_form': u_form,
+        'p_form': p_form
+    }
+    return render(request, 'updateprofile.html', context)
 
-#     def get_queryset(self):
-#         user = get_object_or_404(User, username=self.kwargs.get('username'))
-#         return BlogPost.objects.filter(author=user).order_by('-date_posted')

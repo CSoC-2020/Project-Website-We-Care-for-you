@@ -11,7 +11,7 @@
     {% for post in object_list %}
         
         
-        <h3>{{post.title}}</h3>( USER: <a href="{% url 'profileof' post.author.username %}">{{post.author}}</a> )
+        <h3>{{post.title}}</h3>( USER: <a href="{% url 'profile' post.author.username %}">{{post.author}}</a> )
         <div>
             <p>{{post.content|slice:":200" }}</p>
             <a href="{% url 'blogpost-detail' post.slug  %}">Read More &rarr;</a>

@@ -13,8 +13,11 @@
         <br>
         Username : {{user.username}} | Email : {{user.email}}
         <br>
-        Bio : {{profile.bio}} | Number of Blogs : {{number_of_blogs}}
+        Bio : {{profile.bio}} | Number of Blogs : {{profile.get_num_of_blogs}} | Number of Confessions : {{profile.get_num_of_confessions}}
     </div>
+    {% if profile.user == request.user %}    
+        <a href="{% url 'updateprofile' %}">Update</a>
+    {% endif %}
     <hr>
     <div>
         <h1>Blogs so far</h1>

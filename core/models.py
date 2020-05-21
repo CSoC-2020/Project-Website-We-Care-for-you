@@ -4,13 +4,14 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from PIL import Image
 from django.shortcuts import reverse
+from Blog.models import BlogPost
+from Confession.models import ConfessionPost
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpg',upload_to='profile_pics')
     bio = models.CharField(max_length=200)
-    number_of_blogs = models.IntegerField()
-    number_of_confessions = models.IntegerField()
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -19,6 +20,14 @@ class Profile(models.Model):
         return reverse("profileof", kwargs={
             'slug':self.user.username
         })
+
+    def get_num_of_blogs(self):
+        blogs = BlogPost.objects.filter(author=self.user)
+        return blogs.count()
+
+    def get_num_of_confessions(self):
+        confessions = ConfessionPost.objects.filter(author=self.user)
+        return confessions.count()
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
