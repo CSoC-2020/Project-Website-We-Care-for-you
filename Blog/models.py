@@ -2,7 +2,7 @@ from django.db import models
 import os
 from datetime import datetime
 from django.contrib.humanize.templatetags import humanize
-
+from django.shortcuts import reverse
 from django.conf import settings
 from django.db.models.signals import pre_save
 from django.template.defaultfilters import slugify
@@ -29,7 +29,7 @@ class BlogPost(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now= True)
     status = models.IntegerField(choices=STATUS, default=0)
-
+    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name="bloglikes")
     class Meta:
         ordering = ['-created_on']
 
@@ -39,7 +39,14 @@ class BlogPost(models.Model):
     def get_date(self):
         return humanize.naturaltime(self.created_on)
 
+    def get_absolute_url(self):
+        return reverse("blog:post-detail", kwargs={
+            'slug':self.slug
+        })
 
+    @property
+    def total_likes(self):
+        return self.likes.count()
 
 def get_unique_slug(sender, instance, **kwargs):
     num = 1

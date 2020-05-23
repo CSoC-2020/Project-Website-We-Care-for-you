@@ -6,7 +6,10 @@
     <title>Document</title>
 </head>
 <body>
-    <a href="{% url 'create-confession-post' %}">New Post</a>
+    {% if user.is_authenticated %}
+        <h3>HI {{ user.username }} </h3>
+    {% endif %}
+    <a href="{% url 'confession:create-post' %}">New Post</a>
     {% for post in object_list %}
         <h3>Title : {{post.title}}</h3>
         <p>{{post.get_date}}</p>
@@ -16,8 +19,10 @@
         {% else %}
             <h4>USER: {{post.author}}</h4>
         {% endif %}
+
         <p>Content :{{post.content|slice:":200" }}</p>
-        <a href="{% url 'confessionpost-detail' post.slug  %}">Read More &rarr;</a>
+        <a href="{% url 'confession:post-detail' post.slug  %}">Read More &rarr;</a>
     {% endfor %}
 </body>
+
 </html>

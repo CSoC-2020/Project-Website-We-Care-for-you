@@ -17,17 +17,22 @@ class ConfessionPostList(ListView):
 class CreateConfessionPost(LoginRequiredMixin, CreateView):
     model = ConfessionPost
     fields = ['title', 'content', 'display_name']
-    success_url = "/confessions/"
+    success_url = "/confession:posts/"
 
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.instance.status = int(1)
         return super().form_valid(form)
 
+
+# Detailview with comments
 @login_required
 def confessionpost_detail(request, slug):
     post = get_object_or_404(ConfessionPost, slug=slug)
     comments = post.comments.filter(active=True, parent__isnull=True)
+    is_liked = False
+    if post.likes.filter(id=request.user.id).exists():
+        is_liked = True
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
@@ -50,20 +55,20 @@ def confessionpost_detail(request, slug):
             new_comment.name = request.user
             
             new_comment.save()
-            return redirect(reverse('confessions'))
+            return redirect(reverse('confession:posts'))
     else:
         comment_form = CommentForm()
     return render(request,
                   'confession/confessionpost_detail.html',
-                  {'confessionpost': post,
-                   'comments': comments,
-                   'comment_form': comment_form})
+                  {'confessionpost' : post,
+                   'comments' : comments,
+                   'is_liked' : is_liked,
+                   'comment_form' : comment_form})
 
 class CPUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = ConfessionPost
     fields = ['title', 'content', 'display_name']
-    success_url = "/confessions/"
-
+    success_url = ''
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
@@ -83,3 +88,15 @@ class CPDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user == post.author or post.display_name:
             return True
         return False
+
+
+def like_confessionpost(request):
+    post = get_object_or_404(ConfessionPost, id=request.POST.get('confessionpost_id'))
+    is_liked = False
+    if post.likes.filter(id=request.user.id).exists():          
+        post.likes.remove(request.user)
+        is_liked = False  
+    else:
+        post.likes.add(request.user)
+        is_liked = True
+    return redirect(post.get_absolute_url())

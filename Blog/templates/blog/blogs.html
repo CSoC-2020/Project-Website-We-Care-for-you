@@ -7,14 +7,14 @@
     <title>Document</title>
 </head>
 <body>
-    <a href="{% url 'create-blog-post' %}">New Post</a>
+    <a href="{% url 'blog:create-post' %}">New Post</a>
     {% for post in object_list %}
         
         
         <h3>{{post.title}}</h3>( USER: <a href="{% url 'profile' post.author.username %}">{{post.author}}</a> )
         <div>
             <p>{{post.content|slice:":200" }}</p>
-            <a href="{% url 'blogpost-detail' post.slug  %}">Read More &rarr;</a>
+            <a href="{% url 'blog:post-detail' post.slug  %}">Read More &rarr;</a>
         </div>
         
         {{post.get_date}}

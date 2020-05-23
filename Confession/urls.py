@@ -5,12 +5,17 @@ from Confession.views import (
     CreateConfessionPost,
     CPUpdateView,
     CPDeleteView,
+    like_confessionpost,
 )
+
+app_name = 'confession' 
+
 urlpatterns = [
-    path('confessions/', ConfessionPostList.as_view(), name='confessions'),
-    path('confession/<slug:slug>/', confessionpost_detail, name='confessionpost-detail'),
-    path('create_confession_post/', CreateConfessionPost.as_view(), name='create-confession-post'),
-    path('confessionpost/<slug>/update', CPUpdateView.as_view(), name='confessionpost-update'),
-    path('confessionpost/<slug>/delete', CPDeleteView.as_view(), name='confessionpost-delete'),
+    path('confessions/', ConfessionPostList.as_view(), name='posts'),
+    path('confessionpost/<slug:slug>/', confessionpost_detail, name='post-detail'),
+    path('create_confessionpost/', CreateConfessionPost.as_view(), name='create-post'),
+    path('confessionpost/<slug>/update', CPUpdateView.as_view(), name='post-update'),
+    path('confessionpost/<slug>/delete', CPDeleteView.as_view(), name='post-delete'),
+    path('like_confessionpost/', like_confessionpost, name='like-post'),
 
 ]

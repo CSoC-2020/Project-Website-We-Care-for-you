@@ -5,13 +5,18 @@ from Blog.views import (
     createBlogPost,
     BPUpdateView,
     BPDeleteView,
+    like_blogpost,
     
 )
+
+app_name = 'blog'
+
 urlpatterns = [
-    path('blogs/', BlogPostList.as_view(), name='blogs'),
-    path('blog/<slug:slug>/', blogpost_detail, name='blogpost-detail'),
-    path('create_blog_post/', createBlogPost, name='create-blog-post'),
-    path('blogpost/<slug>/update', BPUpdateView.as_view(), name='blogpost-update'),
-    path('blogpost/<slug>/delete', BPDeleteView.as_view(), name='blogpost-delete'),
+    path('blogs/', BlogPostList.as_view(), name='posts'),
+    path('blogpost/<slug:slug>/', blogpost_detail, name='post-detail'),
+    path('create_blogpost/', createBlogPost, name='create-post'),
+    path('blogpost/<slug>/update', BPUpdateView.as_view(), name='post-update'),
+    path('blogpost/<slug>/delete', BPDeleteView.as_view(), name='post-delete'),
+    path('like_blogpost/', like_blogpost, name='like-post'),
 
 ]

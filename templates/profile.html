@@ -30,7 +30,7 @@
             <p>{{post.get_date}}</p>
             <div>
                 <p>{{post.content|slice:":200" }}</p>
-                <a href="{% url 'blogpost-detail' post.slug  %}">Read More &rarr;</a>
+                <a href="{% url 'blog:post-detail' post.slug  %}">Read More &rarr;</a>
             </div>
         {% endfor %}
     </div>

@@ -38,7 +38,7 @@ def createBlogPost(request):
             
             messages.success(request,
                              "Posted!")
-            return redirect("blogs")
+            return redirect("blog:posts")
         else:
             messages.error(request, "Some errors occured")
     else:
@@ -52,6 +52,9 @@ def createBlogPost(request):
 def blogpost_detail(request, slug):
     post = get_object_or_404(BlogPost, slug=slug)
     comments = post.comments_on_blog.filter(active=True, parent__isnull=True)
+    is_liked = False
+    if post.likes.filter(id=request.user.id).exists():
+        is_liked = True
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
@@ -74,19 +77,20 @@ def blogpost_detail(request, slug):
             new_comment.name = request.user
             
             new_comment.save()
-            return redirect("blogpost-detail", slug=slug)
+            return redirect("blog:post-detail", slug=slug)
     else:
         comment_form = CommentForm()
     return render(request,
                   'blog/blogpost_detail.html',
                   {'blogpost': post,
                    'comments': comments,
+                   'is_liked':is_liked,
                    'comment_form': comment_form})
 
 class BPUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = BlogPost
     fields = ['title', 'content']
-    success_url = "/blogs/"
+    success_url = ""
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -107,3 +111,15 @@ class BPDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user == post.author:
             return True
         return False
+
+def like_blogpost(request):
+    post = get_object_or_404(BlogPost, id=request.POST.get('blogpost_id'))
+    is_liked = False
+    if post.likes.filter(id=request.user.id).exists():          
+        post.likes.remove(request.user)
+        is_liked = False  
+    else:
+        post.likes.add(request.user)
+        is_liked = True
+    return redirect(post.get_absolute_url())
+        
