@@ -7,13 +7,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.template import RequestContext
 
 
 class BlogPostList(ListView):
     queryset = BlogPost.objects.filter(status=1).order_by('-created_on')
     template_name = 'blog/blogs.html'  
     # incomplete (rendering of images in blogpost)
+    paginate_by = 10
 
 
 @login_required
@@ -77,7 +77,7 @@ def blogpost_detail(request, slug):
             new_comment.name = request.user
             
             new_comment.save()
-            return redirect("blog:post-detail", slug=slug)
+            return redirect(post.get_absolute_url())
     else:
         comment_form = CommentForm()
     return render(request,
@@ -112,6 +112,7 @@ class BPDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         return False
 
+@login_required
 def like_blogpost(request):
     post = get_object_or_404(BlogPost, id=request.POST.get('blogpost_id'))
     is_liked = False

@@ -1,13 +1,12 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
 from django.contrib import messages
-from .forms import UserUpdateForm, ProfileUpdateForm
+from .forms import UserUpdateForm, ProfileUpdateForm, DeactivateUserForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, DeleteView
 from core.models import Profile
 from Blog.models import BlogPost, Images
 from django.contrib.auth.models import User
-
 
 def home(request):
     return render(request, 'home.html')
@@ -49,4 +48,6 @@ def updateProfile(request):
         'p_form': p_form
     }
     return render(request, 'updateprofile.html', context)
+
+
 

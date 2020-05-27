@@ -13,11 +13,12 @@ from django.contrib.auth.models import User
 class ConfessionPostList(ListView):
     queryset = ConfessionPost.objects.filter(status=1).order_by('-created_on')
     template_name = 'confession/confessions.html'
+    paginate_by = 10
 
 class CreateConfessionPost(LoginRequiredMixin, CreateView):
     model = ConfessionPost
     fields = ['title', 'content', 'display_name']
-    success_url = "/confession:posts/"
+    success_url = "/confessions/"
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -55,7 +56,7 @@ def confessionpost_detail(request, slug):
             new_comment.name = request.user
             
             new_comment.save()
-            return redirect(reverse('confession:posts'))
+            return redirect(post.get_absolute_url())
     else:
         comment_form = CommentForm()
     return render(request,
@@ -89,7 +90,7 @@ class CPDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         return False
 
-
+@login_required
 def like_confessionpost(request):
     post = get_object_or_404(ConfessionPost, id=request.POST.get('confessionpost_id'))
     is_liked = False
